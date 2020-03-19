@@ -1,0 +1,602 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>.: Hiraganer :. Learn hiragana</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            padding: 1rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .txt-center {
+            text-align: center;
+        }
+
+        #current-score {
+            font-size: 3rem;
+        }
+
+        #show-syllable {
+            font-size: 8rem;
+        }
+
+        #solution-chooser {
+            list-style: none;
+            padding: 0
+        }
+
+        #timmer {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 2rem;
+            margin-top: 2rem;
+        }
+
+        .yellow-btn {
+            font-family: Arial, Helvetica, sans-serif;
+            cursor: pointer;
+            padding: 0.5rem 1.5rem;
+            margin: 0.5rem;
+            font-size: 2rem;
+            background: linear-gradient(to bottom, #f7dfa5, #f0c14b);
+            border: 1px solid;
+            border-color: #a88734 #9c7e31 #846a29;
+            border-radius: 3px;
+            font-weight: 400;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .yellow-btn:hover {
+            background: linear-gradient(to bottom, #f5d78e, #eeb933);
+        }
+
+        .yellow-btn:active {
+            background: linear-gradient(to bottom, #f5d78e, #eeb933);
+            box-shadow: inset 0 0 4px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .green-btn {
+            outline: none;
+            cursor: pointer;
+            padding: 0.5rem 1.5rem;
+            margin: 0.5rem;
+            font-size: 2rem;
+            background: linear-gradient(to bottom, #6c6, #396);
+            border: 1px solid;
+            border-color: #393 #393 #161;
+            border-radius: 3px;
+            font-weight: 400;
+            color: #fff;
+            text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.5);
+        }
+
+        .green-btn:hover {
+            background: linear-gradient(to bottom, #65cb65, #329865);
+        }
+
+        .green-btn:active {
+            background: linear-gradient(to bottom, #65cb65, #329865);
+            box-shadow: inset 0 0 4px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .red-btn {
+            outline: none;
+            cursor: pointer;
+            padding: 0.5rem 1.5rem;
+            margin: 0.5rem;
+            font-size: 2rem;
+            background: linear-gradient(to bottom, #c66, #933);
+            border: 1px solid;
+            border-color: #933 #933 #611;
+            border-radius: 3px;
+            font-weight: 400;
+            color: #fff;
+            text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.5);
+        }
+
+        .red-btn:hover {
+            background: linear-gradient(to bottom, #cb6565, #984343);
+        }
+
+        .red-btn:active {
+            background: linear-gradient(to bottom, #cb6565, #984343);
+            box-shadow: inset 0 0 4px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        #solution-chooser li {
+            max-width: 20rem;
+            margin: 0.5rem auto;
+        }
+
+        @keyframes blink {
+            0% {
+                color: transparent;
+            }
+
+            20% {
+                color: #933;
+            }
+
+            40% {
+                color: transparent;
+            }
+
+            60% {
+                color: #933;
+            }
+
+            80% {
+                color: transparent;
+            }
+
+            100% {
+                color: #933;
+            }
+        }
+
+        #new-record-message {
+            color: transparent;
+        }
+
+        .text-blink {
+            animation: blink 1s forwards;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <div id="high-score">
+            <h2>Highest score:</h2>
+            <!--li><strong>Hiragana:</strong-->
+            <ul id="hiragana-highest-score">
+                <li><strong>Level:</strong> <span id="highest-level">N/A</span></li>
+                <li><strong>Score:</strong> <span id="highest-score">N/A</span></li>
+                <li><strong>Time:</strong> <span id="lowest-time">N/A</span></li>
+            </ul>
+            <div id="new-record-message">New personal record!!</div>
+            <!--/li-->
+            <!-- TODO: Load score data for Katakana and Kanji once they are implemented
+            <li id="katakana-highest-score"><strong>Katakana:</strong> 0</li>
+            <li id="kanji-highest-score"><strong>Kanji:</strong> 0</li>
+            -->
+        </div>
+
+        <div class="txt-center">
+            <button id="start" class="green-btn" type="button">Start</button>
+            <button id="restart" class="green-btn hidden" type="button">Restart</button>
+            <button id="stop" class="red-btn hidden" type="button">Stop</button>
+            <h3 id="current-score" class="hidden"><strong>Current score:</strong> <span
+                    id="current-score-number">0</span></h3>
+        </div>
+
+        <div id="game-wrapper" class="txt-center hidden">
+            <div id="timmer">00:00:00</div>
+            <div id="show-syllable"></div>
+            <ul id="solution-chooser"></ul>
+        </div>
+
+        <div id="setup">
+            <h1>Setup</h1>
+            <!--
+                <div>
+                    <h2>Select alphabet</h2>
+                    <ul>
+                        <li><label><input type="radio" name="alphabet" value="0" checked/> Hiragana</li>    
+                        <li><label><input type="radio" name="alphabet" value="1"/> Katakana (N/A)</li>
+                        <li><label><input type="radio" name="alphabet" value="2"/> Kanji (N/A)</li>
+                        
+                    </ul>
+                </div>
+            -->
+
+            <div id="hiragana">
+                <h2>Hiragana</h2>
+                <h3>Gojüon</h3>
+                <p>Basic japanese syllabary.</p>
+                <ul>
+                    <li><label><input type="checkbox" name="hiragana-level" value="0" checked />Level 1: [&#12354;,
+                            &#12356;, &#12358;, &#12360;, &#12362;] &#8594; [a, i, u, e, o]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="1" />Level 2: [&#12363;, &#12365;,
+                            &#12367;, &#12369;, &#12371;] &#8594; [ka, ki, ku, ke, ko]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="2" />Level 3: [&#12373;, &#12375;,
+                            &#12377;, &#12379;, &#12381;] &#8594; [sa, shi, su, se, so]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="3" />Level 4: [&#12383;, &#12385;,
+                            &#12387;, &#12390;, &#12392;] &#8594; [ta, chi, tsu, te, to]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="4" />Level 5: [&#12394;, &#12395;,
+                            &#12396;, &#12397;, &#12398;] &#8594; [na, ni, nu, ne, no]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="5" />Level 6: [&#12399;, &#12402;,
+                            &#12405;, &#12408;, &#12411;] &#8594; [ha, hi, fu, he, ho]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="6" />Level 7: [&#12414;, &#12415;,
+                            &#12416;, &#12417;, &#12418;] &#8594; [ma, mi, mu, me, mo]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="7" />Level 8: [&#12420;, &#12422;,
+                            &#12424;] &#8594; [ya, yu, yo]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="8" />Level 9: [&#12425;, &#12426;,
+                            &#12427;, &#12428;, &#12429;] &#8594; [ra, ri, ru, re, ro]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="9" />Level 10: [&#12431;, &#12432;,
+                            &#12433;, &#12434;] &#8594; [wa, wi (deprecated), we (deprecated), wo]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="10" />Level 11: [&#12435;] &#8594;
+                            [n]</label></li>
+                </ul>
+
+                <h3>Dakuon</h3>
+                <p>Varions over <strong>K</strong>, <strong>S</strong>, <strong>T</strong> and <strong>H</strong>
+                    syllables with two dots.</p>
+                <ul>
+                    <li><label><input type="checkbox" name="hiragana-level" value="11" />Level 12: [&#12364;, &#12366;,
+                            &#12368;, &#12370;, &#12372;] &#8594; [ga, gi, gu, ge, go]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="12" />Level 13: [&#12374;, &#12376;,
+                            &#12378;, &#12380;, &#12382;] &#8594; [za, ji, zu, ze, zo]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="13" />Level 14: [&#12384;, &#12386;,
+                            &#12389;, &#12391;, &#12393;] &#8594; [da, ji, zu, de, do]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="14" />Level 15: [&#12400;, &#12403;,
+                            &#12406;, &#12409;, &#12412;] &#8594; [ba, bi, bu, be, bo]</label></li>
+                </ul>
+
+                <h3>Handakuon</h3>
+                <p>Variations over <strong>H</strong> syllables with small circle.</p>
+                <ul>
+                    <li><label><input type="checkbox" name="hiragana-level" value="15" />Level 16: [&#12401;, &#12404;,
+                            &#12407;, &#12410;, &#12413;] &#8594; [pa, pi, pu, pe, po]</label></li>
+                </ul>
+
+                <h3>Yöon</h3>
+                <p>Syllables <strong>YA</strong> (&#12420;), <strong>YU</strong> (&#12422;) and <strong>YO</strong>
+                    (&#12424;) combined with the <strong>i</strong> basic syllables.</p>
+                <ul>
+                    <li><label><input type="checkbox" name="hiragana-level" value="16" />Level 17: [&#12365;&#12419;,
+                            &#12365;&#12421;, &#12365;&#12423;] &#8594; [kya, kyu, kyo]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="17" />Level 18: [&#12375;&#12419;,
+                            &#12375;&#12421;, &#12375;&#12423;] &#8594; [sha, shu, sho]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="18" />Level 19: [&#12385;&#12419;,
+                            &#12385;&#12421;, &#12385;&#12423;] &#8594; [cha, chu, cho]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="19" />Level 20: [&#12395;&#12419;,
+                            &#12395;&#12421;, &#12395;&#12423;] &#8594; [nya, nyu, nyo]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="20" />Level 21: [&#12402;&#12419;,
+                            &#12402;&#12421;, &#12402;&#12423;] &#8594; [hya, hyu, hyo]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="21" />Level 22: [&#12415;&#12419;,
+                            &#12415;&#12421;, &#12415;&#12423;] &#8594; [mya, myu, myo]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="22" />Level 23: [&#12426;&#12419;,
+                            &#12426;&#12421;, &#12426;&#12423;] &#8594; [rya, ryu, ryo]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="23" />Level 24: [&#12366;&#12419;,
+                            &#12366;&#12421;, &#12366;&#12423;] &#8594; [gya, gyu, gyo]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="24" />Level 25: [&#12376;&#12419;,
+                            &#12376;&#12421;, &#12376;&#12423;] &#8594; [ja, ju, jo]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="25" />Level 26: [&#12386;&#12419;,
+                            &#12386;&#12421;, &#12386;&#12423;] &#8594; [ja, ju, jo]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="26" />Level 27: [&#12403;&#12419;,
+                            &#12403;&#12421;, &#12403;&#12423;] &#8594; [bya, byu, byo]</label></li>
+                    <li><label><input type="checkbox" name="hiragana-level" value="27" />Level 28: [&#12404;&#12419;,
+                            &#12404;&#12421;, &#12404;&#12423;] &#8594; [pya, pyu, pyo]</label></li>
+                </ul>
+
+                <h3>Sokuon</h3>
+                <p>Symbolizes a pause between two syllables. Represented by a little &#12387; symbol, duplicates the
+                    consonant of the next syllable.</p>
+                <ul>
+                    <li><label><input type="checkbox" name="hiragana-level" value="28" />Level 29: [&#12387;] &#8594;
+                            [pause]</label></li>
+                </ul>
+            </div>
+
+            <div id="katakana" class="hidden">
+                <h2>Katakana</h2>
+                <strong>Not implemented yet</strong>
+                <!--ul>
+                    <li><label><input type="checkbox" name="katakana-level" value="0"/>Level 1: [&#;, &#;, &#;, &#;, &#;] => [a, i, u, e, o]</label></li>
+                </ul-->
+            </div>
+
+            <div id="kanji" class="hidden">
+                <h2>Kanji</h2>
+                <strong>Not implemented yet</strong>
+                <!--ul>
+                    <li><label><input type="checkbox" name="kanji-level" value="0"/>Level 1: [&#;, &#;, &#;, &#;, &#;] => [a, i, u, e, o]</label></li>
+                </ul-->
+            </div>
+        </div>
+    </main>
+    <script>
+        class DataBase {
+
+            instance;
+
+            DB_NAME = 'hiraganer-index';
+            HIRAGANA_INDEX = 'hiragana';
+            LEVEL_INDEX = 'level';
+            SCORE_INDEX = 'score';
+            TIME_INDEX = 'time';
+            /*
+            KATAKANA_INDEX = 'katakana';
+            KANJI_INDEX = 'kanji';
+            */
+
+            database = {};
+
+            constructor() {
+                if (typeof DataBase.instance === 'object') {
+                    return DataBase.instance;
+                } else {
+                    this.database = this._load();
+                    if (!this.database) {
+                        this.database = {};
+                        this.database[this.HIRAGANA_INDEX] = {
+                            level: 0,
+                            score: 0,
+                            time: Infinity
+                        };
+                    }
+                }
+                this._save();
+
+                this.instance = this;
+                return this;
+            }
+
+            clean() {
+                localStorage.clear();
+            }
+
+            _load() {
+                return JSON.parse(window.localStorage.getItem(this.DB_NAME));
+            }
+
+            _save() {
+                localStorage.setItem(this.DB_NAME, JSON.stringify(this.database));
+            }
+
+            updateAlphabetScore(alphabet, level, score, time) {
+                if (alphabet === this.HIRAGANA_INDEX) { // TODO: add conditions for KATANA and KANJI
+                    this.database[alphabet][this.LEVEL_INDEX] = level;
+                    this.database[alphabet][this.SCORE_INDEX] = score;
+                    this.database[alphabet][this.TIME_INDEX] = time;
+                    this._save();
+                }
+
+            }
+
+            getAlphabetScore(alphabet) {
+                return this.database[alphabet];
+            }
+        }
+
+        const db = new DataBase();
+        const MAX_SELECTABLE_OPTIONS = 4;
+        const hiraganaSymbols = [
+            ['&#12354;', '&#12356;', '&#12358;', '&#12360;', '&#12362;'],
+            ['&#12363;', '&#12365;', '&#12367;', '&#12369;', '&#12371;'],
+            ['&#12373;', '&#12375;', '&#12377;', '&#12379;', '&#12381;'],
+            ['&#12383;', '&#12385;', '&#12387;', '&#12390;', '&#12392;'],
+            ['&#12394;', '&#12395;', '&#12396;', '&#12397;', '&#12398;'],
+            ['&#12399;', '&#12402;', '&#12405;', '&#12408;', '&#12411;'],
+            ['&#12414;', '&#12415;', '&#12416;', '&#12417;', '&#12418;'],
+            ['&#12420;', '&#12422;', '&#12424;'],
+            ['&#12425;', '&#12426;', '&#12427;', '&#12428;', '&#12429;'],
+            ['&#12431;', '&#12432;', '&#12433;', '&#12434;'],
+            ['&#12435;'],
+            ['&#12364;', '&#12366;', '&#12368;', '&#12370;', '&#12372;'],
+            ['&#12374;', '&#12376;', '&#12378;', '&#12380;', '&#12382;'],
+            ['&#12384;', '&#12386;', '&#12389;', '&#12391;', '&#12393;'],
+            ['&#12400;', '&#12403;', '&#12406;', '&#12409;', '&#12412;'],
+            ['&#12401;', '&#12404;', '&#12407;', '&#12410;', '&#12413;'],
+            ['&#12365;&#12419;', '&#12365;&#12421;', '&#12365;&#12423;'],
+            ['&#12375;&#12419;', '&#12375;&#12421;', '&#12375;&#12423;'],
+            ['&#12385;&#12419;', '&#12385;&#12421;', '&#12385;&#12423;'],
+            ['&#12395;&#12419;', '&#12395;&#12421;', '&#12395;&#12423;'],
+            ['&#12402;&#12419;', '&#12402;&#12421;', '&#12402;&#12423;'],
+            ['&#12415;&#12419;', '&#12415;&#12421;', '&#12415;&#12423;'],
+            ['&#12426;&#12419;', '&#12426;&#12421;', '&#12426;&#12423;'],
+            ['&#12366;&#12419;', '&#12366;&#12421;', '&#12366;&#12423;'],
+            ['&#12376;&#12419;', '&#12376;&#12421;', '&#12376;&#12423;'],
+            ['&#12386;&#12419;', '&#12386;&#12421;', '&#12386;&#12423;'],
+            ['&#12403;&#12419;', '&#12403;&#12421;', '&#12403;&#12423;'],
+            ['&#12404;&#12419;', '&#12404;&#12421;', '&#12404;&#12423;'],
+            ['&#12387;']
+        ];
+        const hiraganaTranscriptions = [
+            ['a', 'i', 'u', 'e', 'o'],
+            ['ka', 'ki', 'ku', 'ke', 'ko'],
+            ['sa', 'shi', 'su', 'se', 'so'],
+            ['ta', 'chi', 'tsu', 'te', 'to'],
+            ['na', 'ni', 'nu', 'ne', 'no'],
+            ['ha', 'hi', 'fu', 'he', 'ho'],
+            ['ma', 'mi', 'mu', 'me', 'mo'],
+            ['ya', 'yu', 'yo'],
+            ['ra', 'ri', 'ru', 're', 'ro'],
+            ['wa', 'wi', 'we', 'wo'],
+            ['n'],
+            ['ga', 'gi', 'gu', 'ge', 'go'],
+            ['za', 'ji', 'zu', 'ze', 'zo'],
+            ['da', 'ji', 'zu', 'de', 'do'],
+            ['ba', 'bi', 'bu', 'be', 'bo'],
+            ['pa', 'pi', 'pu', 'pe', 'po'],
+            ['kya', 'kyu', 'kyo'],
+            ['sha', 'shu', 'sho'],
+            ['cha', 'chu', 'cho'],
+            ['nya', 'nyu', 'nyo'],
+            ['hya', 'hyu', 'hyo'],
+            ['mya', 'myu', 'myo'],
+            ['rya', 'ryu', 'ryo'],
+            ['gya', 'gyu', 'gyo'],
+            ['ja', 'ju', 'jo'],
+            ['ja', 'ju', 'jo'],
+            ['bya', 'byu', 'byo'],
+            ['pya', 'pyu', 'pyo'],
+            ['pause']
+        ];
+
+        let lowestTime = 0;
+        let currentLevel = 0;
+        let currentHighestHiraganaScore = 0;
+        let highestHiraganaScore = 0;
+        let highestLevel = 0;
+        let startTime;
+        let timmerInterval;
+        let selectedLevels = [];
+        let answer = 0;
+        let listOfOptions = [];
+        let validating = false;
+
+        initializeScore();
+
+        document.getElementById('start').addEventListener('click', startGame);
+        document.getElementById('restart').addEventListener('click', startGame);
+        document.getElementById('stop').addEventListener('click', stopGame);
+        document.addEventListener('click', function (e) {
+            if (e.target && e.target.classList.contains('answer-btn')) {
+                validateAnswer(e.target);
+            }
+        });
+
+        function startGame() {
+            document.getElementById('current-score').classList.remove('hidden');
+            document.getElementById('current-score-number').innerText = 0;
+            document.getElementById('start').classList.add('hidden');
+            document.getElementById('setup').classList.add('hidden');
+            document.getElementById('restart').classList.remove('hidden');
+            document.getElementById('stop').classList.remove('hidden');
+            clearInterval(timmerInterval);
+            startTime = new Date();
+            updateTimer();
+            timmerInterval = setInterval(updateTimer, 1000);
+            document.getElementById('game-wrapper').classList.remove('hidden');
+            selectedLevels = [...document.querySelectorAll('[name="hiragana-level"]:checked')].map((checkbox) => {
+                return parseInt(checkbox.getAttribute('value'));
+            });
+            setNextQuestion();
+            document.getElementById('new-record-message').classList.add('hidden');
+            document.getElementById('new-record-message').classList.remove('text-blink');
+        }
+
+        function stopGame() {
+            clearInterval(timmerInterval);
+            document.getElementById('start').classList.remove('hidden');
+            document.getElementById('setup').classList.remove('hidden');
+            document.getElementById('restart').classList.add('hidden');
+            document.getElementById('stop').classList.add('hidden');
+        }
+
+        function updateTimer() {
+            const now = new Date();
+            let elapsedTimeInSeconds = Math.floor((now - startTime) / 1000);
+            document.getElementById('timmer').innerText = secondsToHumanReadable(elapsedTimeInSeconds);
+        }
+
+        function selectOptions() {
+            let hiraganaSymbolOptions = [];
+            let hiraganaTranscriptionOptions = [];
+            selectedLevels.map((level) => {
+                hiraganaSymbolOptions = [...hiraganaSymbolOptions, ...hiraganaSymbols[level]];
+                hiraganaTranscriptionOptions = [...hiraganaTranscriptionOptions, ...hiraganaTranscriptions[level]];
+            });
+            /*
+             * Since there are some transcriptions that are the same for different symbols, we create a Set to prevent the duplication
+             * of answers (and avoid confusing the user) and make it easier to get the options (although less efficient)
+             */
+            let transcriptionOptions = new Set();
+            let selectedOptions = [];
+            while (selectedOptions.length < MAX_SELECTABLE_OPTIONS) {
+                const randomChoice = getRandom(0, hiraganaSymbolOptions.length);
+                const numOptions = transcriptionOptions.size;
+                transcriptionOptions.add(hiraganaTranscriptionOptions[randomChoice]);
+                if (numOptions < transcriptionOptions.size) {
+                    selectedOptions.push([hiraganaSymbolOptions[randomChoice], hiraganaTranscriptionOptions[randomChoice]]);
+                }
+            }
+            return selectedOptions;
+        }
+
+        function setNextQuestion() {
+            validating = false;
+            listOfOptions = selectOptions();
+            answer = getRandom(0, listOfOptions.length);
+            document.getElementById('show-syllable').innerHTML = listOfOptions[answer][0];
+            const optionsListNode = document.getElementById('solution-chooser');
+            optionsListNode.innerHTML = '';
+            listOfOptions.map((option, index) => {
+                const liChild = document.createElement('li');
+                liChild.setAttribute('data-index', index);
+                liChild.classList.add('yellow-btn', 'answer-btn');
+                liChild.innerHTML = option[1];
+                optionsListNode.appendChild(liChild);
+            });
+        }
+
+        function getRandom(min, max) { // min inclusive, max exclusive
+            return Math.floor(Math.random() * (max - min) + min);
+        }
+
+        function validateAnswer(element) {
+            if (!validating) {
+                validating = true;
+                if (element.getAttribute('data-index') == answer) {
+                    element.classList.add('green-btn');
+                    currentHighestHiraganaScore++;
+                    setTimeout(setNextQuestion, 200);
+                } else {
+                    stopGame();
+                    const correctNode = element.parentNode.childNodes[answer];
+                    correctNode.classList.remove('yellow-btn');
+                    correctNode.classList.add('green-btn');
+                    element.classList.remove('yellow-btn');
+                    element.classList.add('red-btn');
+                }
+                updateScore();
+            }
+        }
+
+        function updateScore() {
+            const now = new Date();
+            let elapsedTimeInSeconds = Math.floor((now - startTime) / 1000);
+            document.getElementById('current-score-number').innerText = currentHighestHiraganaScore;
+            if (currentHighestHiraganaScore >= highestHiraganaScore && currentLevel >= highestLevel) {
+                if (currentHighestHiraganaScore > highestHiraganaScore || currentLevel > highestLevel || elapsedTimeInSeconds < lowestTime) {
+                    lowestTime = elapsedTimeInSeconds;
+                }
+                highestHiraganaScore = currentHighestHiraganaScore;
+                highestLevel = currentLevel;
+                db.updateAlphabetScore('hiragana', highestLevel, highestHiraganaScore, lowestTime);
+                updateHighestScore(true);
+            }
+        }
+
+        function updateHighestScore(showNewRecordMessage) {
+            if (lowestTime !== Infinity) {
+                document.getElementById('highest-level').innerText = highestLevel + 1;
+                document.getElementById('highest-score').innerText = highestHiraganaScore;
+                document.getElementById('lowest-time').innerText = secondsToHumanReadable(lowestTime);
+                if (showNewRecordMessage) {
+                    document.getElementById('new-record-message').classList.remove('hidden');
+                    document.getElementById('new-record-message').classList.add('text-blink');
+                }
+            }
+        }
+
+        function initializeScore() {
+            const hiraganaScore = db.getAlphabetScore('hiragana');
+            highestLevel = hiraganaScore[db.LEVEL_INDEX];
+            highestHiraganaScore = hiraganaScore[db.SCORE_INDEX];
+            lowestTime = hiraganaScore[db.TIME_INDEX];
+            updateHighestScore();
+        }
+
+        function secondsToHumanReadable(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds - hours * 3600) / 60);
+            const remainingSeconds = Math.floor(seconds - hours * 3600 - minutes * 60);
+            return [
+                hours.toString().padStart(2, '0'),
+                minutes.toString().padStart(2, '0'),
+                remainingSeconds.toString().padStart(2, '0')
+            ].join(':');
+        }
+    </script>
+</body>
+
+</html>
