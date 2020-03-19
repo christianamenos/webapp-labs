@@ -8,6 +8,7 @@ They are not into different repositories because I think they are too small to b
 ### Japanizer
 
 **Summary:** Learn Japanese by playing. Find the correct transcription of the Japanese symbols (at this moment only Hiragana) that appear and beat yourself with this little application.
+
 **Possible improvements:**
 
 * Add Katakana support
