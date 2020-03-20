@@ -455,6 +455,7 @@
         });
 
         function startGame() {
+            currentHighestHiraganaScore = 0;
             document.getElementById('current-score').classList.remove('hidden');
             document.getElementById('current-score-number').innerText = 0;
             document.getElementById('start').classList.add('hidden');
@@ -492,6 +493,10 @@
             let hiraganaSymbolOptions = [];
             let hiraganaTranscriptionOptions = [];
             selectedLevels.map((level) => {
+                if (level > currentLevel) {
+                    currentLevel = level;
+                    console.log('ENTRO');
+                }
                 hiraganaSymbolOptions = [...hiraganaSymbolOptions, ...hiraganaSymbols[level]];
                 hiraganaTranscriptionOptions = [...hiraganaTranscriptionOptions, ...hiraganaTranscriptions[level]];
             });
@@ -546,8 +551,8 @@
                     correctNode.classList.add('green-btn');
                     element.classList.remove('yellow-btn');
                     element.classList.add('red-btn');
+                    updateScore();
                 }
-                updateScore();
             }
         }
 
@@ -555,10 +560,8 @@
             const now = new Date();
             let elapsedTimeInSeconds = Math.floor((now - startTime) / 1000);
             document.getElementById('current-score-number').innerText = currentHighestHiraganaScore;
-            if (currentHighestHiraganaScore >= highestHiraganaScore && currentLevel >= highestLevel) {
-                if (currentHighestHiraganaScore > highestHiraganaScore || currentLevel > highestLevel || elapsedTimeInSeconds < lowestTime) {
-                    lowestTime = elapsedTimeInSeconds;
-                }
+            if (currentHighestHiraganaScore > 0 && (currentHighestHiraganaScore > highestHiraganaScore || currentLevel > highestLevel || elapsedTimeInSeconds < lowestTime)) {
+                lowestTime = elapsedTimeInSeconds;
                 highestHiraganaScore = currentHighestHiraganaScore;
                 highestLevel = currentLevel;
                 db.updateAlphabetScore('hiragana', highestLevel, highestHiraganaScore, lowestTime);
